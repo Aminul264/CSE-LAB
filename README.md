@@ -1,4 +1,8 @@
-# LAB
- <a> Software Development </a>
+# LAB WORKS
 
-# Lab1
+<p>
+ Md. Aminul Islam <br>
+ Department of Computer Science and Engineering,<br>
+ University of Rajshahi
+ 
+</p>
