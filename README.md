@@ -7,7 +7,7 @@
  
 </p>
 
-# CSE 3rd Year 1st Semester
+# CSE3Y1S
 <ul>
    <li>  <h3><a href="https://github.com/Aminul264/CSE-LAB/tree/main/CSE3Y1S/Computer%20Network">Computer Network</a> </h3> </li>
    <li>  <h3><a href="https://github.com/Aminul264/CSE-LAB/tree/main/CSE3Y1S/Compiler%20Design">Compiler Design</a> </h3> </li>
