@@ -17,7 +17,7 @@
  
 # CSE3Y2S
 <ul>
-   <li>  <h3><a href="https://github.com/Aminul264/CSE-LAB/tree/main/CSE3Y2S/Assembly%20Language%20Programming">Computer Network</a> </h3> </li>
+   <li>  <h3><a href="https://github.com/Aminul264/CSE-LAB/tree/main/CSE3Y2S/Assembly%20Language%20Programming">Assembly Language Programming</a> </h3> </li>
 
  
  </ul>
