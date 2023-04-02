@@ -30,6 +30,7 @@ void solve()
                 mp[q.front()]=0;
                 q.pop();
                 q.push(frame[i]);
+                mp[frame[i]]=1;
             }
         }
 
