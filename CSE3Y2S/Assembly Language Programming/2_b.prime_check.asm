@@ -1,5 +1,5 @@
 ;even odd check (1-9)
-;given a digit (1-9)  then check is it even or odd
+;given a digit (1-9)  prime check
 
 
 .MODEL SMALL
