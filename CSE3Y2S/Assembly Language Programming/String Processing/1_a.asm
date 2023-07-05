@@ -1,93 +1,88 @@
 ;Case conversion
 
-.model small
-.stack 100h
-.data  
-    msg1 db 'Enter a string : $'
-    msg2 db 10,13,'After case conversion : $' 
-    str  db 10,13,100 dup ('$');
-.code
+.MODEL SMALL 
+.STACK 100H
+.DATA
 
-main proc 
-    mov ax,@data
-    mov ds,ax
-    
-    lea dx,msg1
-    mov ah,9
-    int 21h   
-    
-    ;input
-    mov  si,0
-input:
-     mov ah,1
-     int 21h  
-     
-     cmp al,13
-     je end_input
-     mov str[si],al  
-     inc si
-     jmp input
-
-
-end_input: 
-     mov si,0
-
-      
-case_conversion:
-      
-     
-     cmp str[si],'$'
-     je end_conversion
-     
-     cmp str[si],'A'
-     jl no_change 
-     cmp str[si],'Z'
-     jle to_lower
-     
-     
-     cmp str[si],'z' 
-     jg no_change  
-     cmp str[si],'a'
-     jge to_upper
-     
-     
+ MSG1 DB '      INPUT STRING : $'
+ MSG2 DB 10,13,'AFTER CASE CONVERTION: $'
+ 
+ ARR DB 100 DUP('$')
+ 
+.CODE
           
-     
-no_change:
-     inc si
-     jmp case_conversion  
-     
-     
-to_lower:
-        add str[si],32
-        inc si
-        jmp case_conversion 
-to_upper:
-        sub str[si],32
-        inc si
-        jmp case_conversion
-        
-        
- 
- 
-end_conversion:
-     
-     lea dx,msg2
-     mov ah,9
-     int 21h
-             
-             
-     ;after conversion
-     
-     lea dx,str
-      mov ah,9
-      int 21h 
-     
+               
+          
+MAIN PROC  
     
+    
+    MOV AX,@DATA
+    MOV DS,AX 
+    
+    
+    LEA DX,MSG1
+    MOV AH,9
+    INT 21H
+         
+    MOV SI,0
+    MOV DI,0
+       
+    MOV AH,1 
+    
+    INPUT:
       
-    exit:
-    mov ah,4ch
-    int 21h
+      INT 21H
+      CMP AL,13;IF ENTER KEY IN PRESSED
+      JE END_INPUT
+      
+      MOV ARR[SI],AL
+      INC SI
+      JMP INPUT 
+      
+    END_INPUT:
+    MOV SI,-1  
     
-    main endp
-end main
+    CASE_CONVERSION:
+       
+       INC SI
+       CMP ARR[SI],'$'
+       JE DISPLAY
+       
+       CMP ARR[SI],'A'
+       JL NO_CHANGE
+       CMP ARR[SI],'z'
+       JG NO_CHANGE
+       CMP ARR[SI],'Z'
+       JLE TO_LOWER
+       CMP ARR[SI],'a'
+       JGE TO_UPPER
+       
+    NO_CHANGE:
+      JMP CASE_CONVERSION
+       
+    TO_LOWER:
+       ADD ARR[SI],32
+       JMP CASE_CONVERSION 
+       
+    TO_UPPER: 
+       SUB ARR[SI],32 
+       JMP CASE_CONVERSION
+    
+       
+       
+    DISPLAY: 
+    LEA DX,MSG2
+    MOV AH,9
+    INT 21H
+    
+    LEA DX,ARR
+    MOV AH,9
+    INT 21H
+
+    
+    EXIT:
+    MOV AH,4CH
+    INT 21H
+    
+    MAIN ENDP
+END MAIN
