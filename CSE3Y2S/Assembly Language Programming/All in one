@@ -369,7 +369,92 @@ END MAIN
 
 ;************************************************************
 
+;SORTING ASCENDING
 
+.model small
+.stack 100h
+.data  
+   input db 'Enter a input string(1-3): $'
+   output db 10,13,'The acsending order is :  $' 
+   
+   arr db 100 dup('$')
+   
+.code
+
+MAIN PROC  
+    
+    mov ax,@data
+    mov ds,ax 
+    
+    
+    ;show input msg
+    mov ah,9
+    lea dx,input  
+    int 21h 
+    
+    ;initialization
+    
+    mov si,0
+    mov di,0
+    
+    
+    ;take input
+    mov ah,1
+    INPUT_: 
+        
+        int 21h
+        cmp al,13   ;if enter key is pressed
+        je END_INPUT
+        
+        mov arr[si],al
+        inc si
+        
+        jmp INPUT_ 
+        
+        _              
+    END_INPUT:
+        mov arr[si],'$'
+        mov si,-1
+    
+    
+    outer_loop: 
+         inc si  
+         mov di,si
+         cmp arr[si],'$'
+         je result 
+    
+     inner_loop: 
+         inc di
+         cmp arr[di],'$'
+         jz outer_loop
+         
+         ;;mem to mem not possible 
+         mov bl,arr[di]
+         cmp bl,arr[si]
+         jge inner_loop 
+         
+         XCHG bl,arr[si]
+         mov arr[di],bl 
+         jmp inner_loop
+       
+    
+    result:
+     mov ah,9
+     lea dx,output
+     int 21h
+     
+     mov ah,9
+     lea dx,arr
+     int 21h
+     
+    
+    exit:
+    mov ah,4ch
+    int 21h
+    
+    MAIN ENDP 
+END MAIN
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
