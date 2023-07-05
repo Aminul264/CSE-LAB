@@ -1,65 +1,71 @@
 ;string reversal : using array
 
+.MODEL SMALL 
+.STACK 100H
+.DATA
 
-.model small
-.stack 100h
-.data  
-
- msg1 db 'Enter a string  : $'
- msg2 db 10,13,'After reversal : $'
+ MSG1 DB '      INPUT STRING  : $'
+ MSG2 DB 10,13,'AFTER REVERSAL: $'
  
- str db 10,13,100 dup ('$')
-.code
-
-main proc   
+ ARR DB 100 DUP('$')
+ 
+.CODE
+          
+               
+          
+MAIN PROC  
     
-    mov ax,@data
-    mov ds,ax   
     
-    ;print msg1
-    lea dx,msg1
-    mov ah,9
-    int 21h
+    MOV AX,@DATA
+    MOV DS,AX 
     
-    ;take input
-    mov si,0
-input:  
-
-      mov ah,1
-      int 21h
-      cmp al,13
-      je end_input  
-      mov str[si],al
-      inc si 
-      jmp input 
+    
+    LEA DX,MSG1
+    MOV AH,9
+    INT 21H
+         
+    MOV SI,0
+    MOV DI,0
+       
+    MOV AH,1 
+    
+    INPUT:
       
-end_input:
-    dec si 
+      INT 21H
+      CMP AL,13;IF ENTER KEY IN PRESSED
+      JE END_INPUT
+      
+      MOV ARR[SI],AL
+      INC SI
+      JMP INPUT 
+      
+    END_INPUT:
+    MOV DI,SI
+    MOV SI,-1
     
+    REVERSE:
+      INC SI
+      DEC DI 
+      CMP SI,DI 
+      JG DISPLAY
+      MOV BL,ARR[SI]
+      XCHG BL,ARR[DI] 
+      MOV ARR[SI],BL
+      JMP REVERSE
+       
+    DISPLAY: 
+    LEA DX,MSG2
+    MOV AH,9
+    INT 21H
     
-;print msg2
-   lea dx,msg2
-   mov ah,9
-   int 21h
+    LEA DX,ARR
+    MOV AH,9
+    INT 21H
 
-   
-;after reverse
-print:
-   cmp si,-1
-   je exit
-   
-   mov dl,str[si]
-   mov ah,2
-   int 21h 
-   
-   dec si
-   jmp print
-   
-
     
-    exit:
-    mov ah,4ch
-    int 21h
+    EXIT:
+    MOV AH,4CH
+    INT 21H
     
-    main endp
-end main
+    MAIN ENDP
+END MAIN
