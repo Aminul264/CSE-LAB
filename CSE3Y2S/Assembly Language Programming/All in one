@@ -232,6 +232,80 @@ END MAIN
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   CHECK PRIME OR NOT;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+.model small
+.stack 100h
+.data  
+   input db 'Enter a number(1-3): $'
+   output1 db 10,13,'The number is prime $' 
+   output2 db 10,13,'The number is not prime $'
+   n db ?
+   
+.code
+
+MAIN PROC  
+    
+    mov ax,@data
+    mov ds,ax 
+    
+    
+    ;show input msg
+    mov ah,9
+    lea dx,input  
+    int 21h 
+    
+    
+    ;take input
+    mov ah,1
+    int 21h
+    
+    ;ascci to digit and initialization
+    sub al,48
+    mov n,al
+    mov ah,0   
+    xor cx,cx
+    mov cl,al
+    sub cl,1
+    
+    check:
+      cmp cl,1
+      je result  
+      div cl ; (quotioent)al=ax/bl, (remainder)ah= ax % bl
+      cmp ah,0 
+      jz not_prime
+      
+      xor ax,ax
+      mov al,n 
+      
+     Loop check
+    
+      
+   result: 
+   
+   prime:
+       mov ah,9
+       lea dx,output1
+       int 21h
+       jmp exit 
+       
+   not_prime:
+     mov ah,9
+     lea dx,output2
+     int 21h 
+    
+    exit:
+    mov ah,4ch
+    int 21h
+    
+    MAIN ENDP 
+END MAIN
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 
 
 
