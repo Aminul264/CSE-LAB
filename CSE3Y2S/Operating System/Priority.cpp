@@ -1,105 +1,97 @@
-//arrival time zero
 #include<bits/stdc++.h>
 using namespace std;
 
-int n;
-vector<pair<string,int> > v;
-
-struct Priority
+struct priority
 {
-	string process;
-	int bstT;
-	int priority;
+    string process;
+    int bstT;
+    int prio; 
 };
 
-void Sort(struct Priority algo[])
+int n;
+vector<int>v;
+
+bool compare (struct priority a,struct priority b)
 {
-	for(int i=0;i<n;i++)
-	{
-		for(int j=i;j<n;j++)
-		{
-			if(algo[i].priority>algo[j].priority)
-			{
-				swap(algo[i],algo[j]);
-			}
-		}
-	}
+   return a.prio<b.prio;
 }
+
+
 string Space(int n)
 {
-	string s="";
-	while(n--)
-	{
-		s+=" ";
-	}
-	return s;
-}
-void ganntChart(struct Priority algo[])
-{
-	int prevT;
-	v.push_back({"",0});
-	for (int i = 0; i < n; ++i)
-	{
-		prevT=v[v.size()-1].second;
-		v.push_back({algo[i].process,algo[i].bstT+prevT});
+    string s="";
+    while(n--)
+    {
+        s+=" ";
+    }
+    return s;
 
-	}
-	//design ganntChart
-	for (int i = 1; i < v.size(); ++i)
-	{
-		cout<<v[i].first<<Space(v[i].second-v[i-1].second);
-	}
-	cout<<"\n\n";
-	for(int i=1;i<v.size();i++)
-	{
-		cout<<v[i-1].second;
-		string s =Space(v[i].second-v[i-1].second);
-		s+=" ";
-		cout<<s;
-	}
 }
+void Average()
+{
+    double avg=0;
+    for(int i=0;i<v.size()-1;i++)
+    {
+        avg+=v[i];
+    }
+    cout<<"Average waiting time: "<<avg<<endl;
+    avg=0;
+    for(int i=0;i<v.size();i++)
+    {
+        avg+=v[i];
+    }
+    cout<<"Average turnaround time: "<<avg<<endl;
+}
+void gantChart(vector<priority>p)
+{
+    
+    int prev=0;
+    v.push_back(0);
+    for(int i=0;i<n;i++)
+    {   
+        if(i==0) prev=0;
+        else prev = v[v.size()-1];
+        v.push_back(p[i].bstT+prev);
+    }
 
-void AWT()
-{
-	double avg=0;
-	for(int i=0;i<v.size()-1;i++)
-	{
-		avg+=v[i].second;
-	}
-	cout<<"\nAverage waiting time  : "<<avg/n<<"\n";
-}
-void ATT()
-{
-	double avg=0;
-	for(int i=0;i<v.size();i++)
-	{
-		avg+=v[i].second;
-	}
-	cout<<"\nAverage turn around time  : "<<avg/n<<"\n";
+
+    for(int i=0;i<n;i++)
+    {
+        cout<<""<<p[i].process<<Space((v[i+1]-v[i]));
+    }
+    cout<<endl<<endl;
+   //print  waiting time
+    for(int i=0;i<v.size()-1;i++)
+    {
+      cout<<v[i]<<Space(v[i+1]-v[i]);
+    }
+    cout<<v[v.size()-1]<<endl;
+
 }
 int main()
 {
-	//file input
-	freopen("../input.txt", "r", stdin);
-	freopen("../output.txt", "w", stdout);
 
-	//number of process
-	cin>>n;
-	struct Priority algo[n];
-	//input:: process,burstTime,priority order
-	for (int i = 0; i < n; ++i)
-	{
-		cin>>algo[i].process;
-		cin>>algo[i].bstT;
-		cin>>algo[i].priority;
-	}
+    freopen("input.txt","r",stdin);
+    cin>>n;
+    vector<priority> p(n);
 
-	Sort(algo);
-	ganntChart(algo);
-	//calculate average waiting time
-	AWT();
-	//calculate average turn around time
-	ATT();
+    for(int i=0;i<n;i++)
+    {
+      cin>>p[i].process;
+      cin>>p[i].bstT;
+      cin>>p[i].prio;
+    }
 
+    sort(p.begin(),p.end(),compare);
+    // for(int i=0;i<n;i++)
+    // {
+    //     cout<<p[i].process<<" "<<p[i].bstT<<" "<<p[i].prio<<endl;
+    // }
+
+    gantChart(p);
+    
+
+    //average waiting time::and  turn Around time
+     Average();
 
 }

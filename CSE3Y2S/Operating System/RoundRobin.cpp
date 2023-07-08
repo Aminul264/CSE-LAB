@@ -1,119 +1,89 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-
-int n,timeQuantum;
-vector<pair<string,int> > v;
-
-struct RoundRobin
+int n,q=4;
+vector<pair<string,int> >v;
+struct rr
 {
-	string process;
-	int bstT;
+  string process;
+  int bst;
 };
 
+//waiting time = last completion time - burst time
+void waitingTime(vector<rr>p)
+{
+  
+  double avgw=0,avgt=0;
+  for(int i=0;i<n;i++)
+  {
+    for(int j=v.size()-1;j>=0;j--)
+    {
+      if(p[i].process==v[j].first)
+      {
+           avgw+=v[j].second-p[i].bst;
+           avgt+=p[i].bst;
+           break;
+      }
+    }
+  }
+  cout<<"Average waiting time :"<<avgw/n<<endl;
+  cout<<"Average turn around time : "<<(avgt+avgw)/n<<endl;//waiting+burst
+ }
 string Space(int n)
 {
-	string s="";
-	while(n--)
-	{
-		s+=" ";
-	}
-	return s;
+  string s="";
+  while(n--){
+    s+=" ";
+  }
+  return s;
 }
-void ganntChart(struct RoundRobin algo[])
-{
-	v.push_back({"",0});
-	int complete=0,i=0;
-	int remT,prevT;
-	while(complete!=n)
-	{
-		remT=algo[i].bstT;
-		prevT=v[v.size()-1].second;
+void algo(vector<rr>p)
+ {
+  int complete=0,i=0,rem,prev;
+  v.push_back({" ",0});
+  while(complete!=n)
+  {
+    rem=p[i].bst;
+    prev=v[v.size()-1].second;
+    if(rem<=q && rem)
+    {
+      v.push_back({p[i].process,rem+prev});
+      p[i].bst=0;
+      complete++;
+    }
+    else if(rem)
+    {
+      v.push_back({p[i].process,q+prev});
+      p[i].bst=p[i].bst-q;
+    }
+    i++;
+    i%=n;
+  }
 
-		if(algo[i].bstT<timeQuantum && remT)
-		{
-			algo[i].bstT=0;
-			v.push_back({algo[i].process,remT+prevT});
-		}
-		else if(remT)//active:burstime not zero
-		{
-			algo[i].bstT-=timeQuantum;
-			v.push_back({algo[i].process,prevT+timeQuantum});
-		}
-
-		if(algo[i].bstT==0 && remT)
-		{
-			complete++;
-		}
-		i++;
-		i%=n;
-	}
-
-	//design ganntChart
-	for(int i=1;i<v.size();i++)
-	{
-		cout<<v[i].first<<Space(v[i].second-v[i-1].second);
-	}
-	cout<<"\n";
-	for(int i=1;i<v.size();i++)
-	{
-		cout<<v[i-1].second<<Space(v[i].second-v[i-1].second);
-	}
-	cout<<v[v.size()-1].second<<"\n";
-}
-
-int findPrevSameprocess(int j)
-{
-	for(int i=j;i>=0;i--)
-	{
-		if(v[i].first==v[j].first)
-		{
-			return v[i].second;
-		}
-	}
-	return 0;
-}
-
-void AWT(RoundRobin algo[],RoundRobin algo1[])
-{
-	double avg=0,avgtt;
-	for(int i=0;i<n;i++)
-	{
-		for (int j = 1; j < v.size(); j++)
-		{
-			if(v[j].first==algo[i].process)
-			{
-				int w=findPrevSameprocess(j);
-				avg+=(v[j-1].second-w);// starting time - prevoius compelition time
-				cout<<avg<<" ";
-			}
-		}
-		//calculate turn aroundTime :: burst Time+ waiting time
-		avgtt+=(avg+algo1[i].bstT);
-	}
-	cout<<"\nAverage waiting time : "<<avg/n<<"\n";
-	cout<<"Average turn around time : "<<avgtt/n<<"\n";
+  //process sequence 
+  for(int i=0;i<v.size();i++)
+  {
+    cout<<v[i].first<<" ";
+  }
+  cout<<endl;
+  //waiting time s
+  for(int i=0;i<v.size();i++)
+  {
+    cout<<v[i].second<<" ";
+  }
+  cout<<endl;
 }
 int main()
 {
-	freopen("../input.txt","r",stdin);
-	freopen("../output.txt","w",stdout);
+  freopen("input.txt","r",stdin);
+  cin>>n;
+  vector<rr>p(n),copy(n);
+  for(int i=0;i<n;i++)
+  {
+    cin>>p[i].process;
+    cin>>p[i].bst;
 
-	//number of process,timeQuantum;
-	cin>>n>>timeQuantum;
-	struct RoundRobin algo[n],algo1[n];
-	//input::process,burst time
-	for (int i = 0; i < n; ++i)
-	{
-		cin>>algo[i].process;
-		cin>>algo[i].bstT;
-		//copy
-		cin>>algo1[i].process;
-		cin>>algo1[i].bstT;
-	}
-	ganntChart(algo);
-	//calculat average waiting time
-	AWT(algo,algo1);
-
-
+  }
+  algo(p);
+  waitingTime(p);
 }
