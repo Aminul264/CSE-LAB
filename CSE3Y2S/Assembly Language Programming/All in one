@@ -684,89 +684,97 @@ END MAIN
 ;************FIND FIRST CAPITAL AND LAST CAPITAL********************************
 
  ;FIND OUT FIRST CAPITAL AND LAST CAPITAL 
-.MODEL SMALL 
+.MODEL SMALL
 .STACK 100H
-.DATA
- 
- MSG0 DB 10,13,'ENTER ACSTRING : $'
- MSG1 DB 10,13,'FIRST CAPITAL : $' 
- MSG2 DB 10,13,'LAST CAPITAL  : $'
- MSG3 DB 10,13,'NO CAPITAL  : $'
- 
- ARR DB 100 DUP('$') 
- FC  DB 91   ;FC=FIRST CAPITAL
- LC  DB 64  ;LC=LAST CAPITAL
- 
- 
+.DATA 
+MSG1 DB 'INPUT STRING : $'
+MSG2 DB 10,13,'FIRST CAPITAL : $'
+MSG3 DB 10,13,'LAST CAPITAL  : $'
+MSG4 DB 10,13,'NO CAPITAL $'
+
+FC DB 91
+LC DB 64
+
+
 .CODE
-          
-               
-          
-MAIN PROC  
-    
+MAIN PROC 
     
     MOV AX,@DATA
     MOV DS,AX 
     
     
-    LEA DX,MSG0
     MOV AH,9
-    INT 21H
-       
-    MOV AH,1 
-    MOV SI,-1
+    LEA DX,MSG1 
+    INT 21H   
     
-    INPUT:
-      INT 21H
-      CMP AL,13;IF ENTER KEY IN PRESSED
-      JE END_INPUT 
-      
-      CMP AL,'Z'
-      JG INPUT 
-      CMP AL,FC
-      JL UPDATE_FC 
-      CMP AL,LC
-      JG UPDATE_LC
-      
-      JMP INPUT 
+    MOV AH,1
+    INPUT:   
     
-    UPDATE_FC: 
-       MOV FC,AL
+        INT 21H
+        CMP AL,13
+        JE END_INPUT
+        
+        CMP AL,'Z'
+        JG INPUT
+        CMP AL,'A'
+        JL INPUT
+        
+        CMP AL,FC
+        JL UPDATE_FC
+        
+        CMP AL,LC
+        JG UPDATE_LC  
+        
+        
+        
+        JMP INPUT
+        
+    UPDATE_FC:
+    
+        MOV FC,AL
+ 
+       ;SAY ONLY ONE INPUT
+       CMP LC,AL
+       JL UPDATE_LC
+         
        JMP INPUT
-       
-    UPDATE_LC:
-       MOV LC,AL
-       JMP INPUT
-      
-    END_INPUT:
+        
+    UPDATE_LC: 
     
+        MOV LC,AL
+        JMP INPUT
+    
+        
+    END_INPUT: 
     
     CMP LC,64
-    JNE PRINT
+    JE NO_CAPITAL
     
-    MOV AH,9
-    LEA DX,MSG3
-    INT 21H 
-    JMP EXIT
-    
-    
+ 
     PRINT:
-    LEA DX,MSG1
+            
     MOV AH,9
-    INT 21H
+    LEA DX,MSG2
+    INT 21H   
+    ;PRINT FC
     MOV AH,2
     MOV DL,FC
     INT 21H 
-    
+    ;PRINT LC
     MOV AH,9
-    LEA DX,MSG2
-    INT 21H
+    LEA DX,MSG3
+    INT 21H  
     MOV AH,2
     MOV DL,LC
     INT 21H
-
-       
-
+    JMP EXIT
+    
+    
+        
+    NO_CAPITAL:
+        MOV AH,9       
+        LEA DX,MSG4
+        INT 21H
     
     EXIT:
     MOV AH,4CH
@@ -774,6 +782,7 @@ MAIN PROC
     
     MAIN ENDP
 END MAIN
+
 
 ;*****************************************************
 ;*******************SUBSTRING FINDING******************************
