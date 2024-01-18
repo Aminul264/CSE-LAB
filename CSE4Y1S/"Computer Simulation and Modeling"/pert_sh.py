@@ -1,47 +1,60 @@
 import sys
-
-sys.stdin = open('pert_sh.txt', 'r')
-MX = 1000
+sys.stdin=open('pert_sh.txt','r')
 
 class Activity:
-	def __init__(self, id, start, end, dur) -> None:
-		self.start = start
-		self.id = id
-		self.end = end
-		self.dur = dur
-		self.es = 0
-		self.ef = 0
-		self.ls = 0
-		self.lf = 0
+    def __init__(self,id,start,end,dur) -> None:
+        self.id=id
+        self.start=start
+        self.end=end
+        self.dur=dur
+        self.es=0
+        self.ef=0
+        self.ls=0
+        self.lf=0
+        
 
-n, m = map(int, input().split(' '))
+activities={}   
+forward_f=[0]*100 #updated earliest_finish time of end_node of a activity
+backward_f=[10000]*100 #updated latest_finish time of start node of an activity
 
-activities = {}
-node_f = [0]*100
-node_r = [0]*100
+ 
 
-for i in range(1, n + 1): # 1<=n
-	id, start, dur, end = map(int, input().split())
-	activities[i] = Activity(id, start, end, dur)
+edge,node=map(int,input().split(' '))
+# print(type (e))
 
+# taking input from file
+def take_input():
+    for i in range(1,edge+1):
+        id,start,dur,end=map(int,input().split(' '))
+        activities[i]=Activity(id,start,end,dur)
+        # print(f'id : {id}')
 
-for i in range(1, n + 1):
-	activities[i].es = node_f[activities[i].start]  # est(k) = ent(s(k))
-	activities[i].ef = activities[i].es + activities[i].dur  # eft(k) = est(k) + t(k)
-	node_f[activities[i].end] = max(node_f[activities[i].end], activities[i].ef)
+def forward_pass():
+    for i in range(1,edge+1):
+        activities[i].es=forward_f[activities[i].start]
+        activities[i].ef=activities[i].es+activities[i].dur
+        forward_f[activities[i].end]=max(forward_f[activities[i].end],activities[i].ef)
 
-
-# backward pass calculation
-for i in range(1,m + 1): #  1<=m
-	node_r[i] = 100 # mx value initilize
-
-node_r[m] = node_f[m] 
-
-for i in range(n, 0, -1):
-	activities[i].lf = node_r[activities[i].end]  
-	activities[i].ls = activities[i].lf - activities[i].dur  
-	node_r[activities[i].start] = min(node_r[activities[i].start], activities[i].ls)  
-
-for i in range(1, n + 1):
-	if activities[i].es == activities[i].ls and activities[i].lf == activities[i].ef:
-		print(i, end=" > ")
+def backward_pass():
+    # assign the lastest_finish_time of end_node of an activity (forward pass) to the backward_pass as the lastest_finish time
+    backward_f[node]=forward_f[node]
+    
+    for i in range(edge,0,-1):
+        activities[i].lf=backward_f[activities[i].end]
+        activities[i].ls=activities[i].lf-activities[i].dur
+        backward_f[activities[i].start]=min(backward_f[activities[i].start],activities[i].ls)
+        
+def display_path():
+    for i in range(1,edge+1):
+        if activities[i].es==activities[i].ls:
+            print(chr(i+64), end=' > ')
+            # print character(id)
+            
+def main():
+    take_input()
+    forward_pass()
+    backward_pass()
+    display_path()
+    
+if __name__=='__main__':
+    main()       
