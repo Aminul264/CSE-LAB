@@ -25,11 +25,11 @@ def pure_persuit(v,min_dist,max_dist):
         elif distance>=max_dist:
             plt.plot([xb,xf],[yb,yf])
             plt.text(50,45,f'Bomber escaped at :{count} sec')
-            print('Bomber escaped at step {count}')
+            print(f'Bomber escaped at step {count}')
             plt.pause(5)
             break
         else:
-            xb,yb=np.random.randint(1,1000,2)
+            xb,yb=np.random.randint(max(1,xb-100),min(1000,yb+100),2)
             x_bomber.append(xb)
             y_bomber.append(yb)
             
@@ -39,11 +39,8 @@ def pure_persuit(v,min_dist,max_dist):
             y_fighter.append(yf)
             
             # display
-            plt.scatter(xb,yb,marker='o',color='red',label='Bomber')
-            plt.plot(x_bomber,y_bomber,color='red')
-            
-            plt.scatter(xf,yf,marker='o',color='green',label='Fighter')
-            plt.plot(x_fighter,y_fighter,color='green')
+            plt.plot(x_bomber,y_bomber,'r',marker='o',label='bomber')
+            plt.plot(x_fighter,y_fighter,'g',marker='o',label='fighter')
             
             plt.pause(0.5)
         if count==1:
