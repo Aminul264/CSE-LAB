@@ -1,63 +1,61 @@
 # Take grayscale image of size 512x512 and perform the following operations - 
-
 # Illustrate the histogram of the image and make single threshold segmentation observed from the histogram
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-def Histogram(img):
-    row,col=img.shape
-    hist=np.zeros(256,dtype=np.uint8)
-    for i in range(row):
-        for j in range(col):
-            hist[img[i][j]]+=1
-    return hist
-
-def Thresolding(img,thresold):
-    row,col=img.shape
-    temp=np.zeros((row,col),dtype=np.uint8)
-    for i in range(row):
-        for j in range(col):
-            if img[i][j]<thresold:
-                temp[i][j]=0
+def thresholding(img,threshold):
+    h,w=img.shape
+    temp_img=np.zeros((h,w),np.uint8)
+    for i in range(h):
+        for j in range(w):
+            if img[i,j]<threshold:
+                temp_img[i,j]=0
             else:
-                temp[i][j]=255
-    return temp
-    
-def main():
-    img=cv2.imread('../images/fingerprint.jpg',cv2.IMREAD_GRAYSCALE)
-    row,col=512,512
-    img=cv2.resize(img,(row,col))
-    histo1=Histogram(img)
-    
-    # thresolding
-    thresold=np.mean(img)#take a mean value: thresold point
-    thresold_img=Thresolding(img,thresold)
-    
-    # call histogram
-    histo2=Histogram(thresold_img)
-    
-    
-    # print
-    plt.subplot(2,2,1)
+                temp_img[i,j]=255
+    return temp_img
 
+def histogram(img):
+    # hist=[0]*256
+    hist=np.zeros(256,np.uint32)
+    h,w=img.shape
+    for i in range(h):
+        for j in range(w):
+            hist[img[i,j]]+=1
+    return hist
+  
+def main():
+    img=cv2.imread('../images/skleton.png',0)
+    img=cv2.resize(img,(512,512))
+    threshold=np.mean(img)
+    threshold_img=thresholding(img,threshold)
+    
+    plt.subplot(2,2,1)
     plt.imshow(img,cmap='gray')
     plt.title('original image')
     
     plt.subplot(2,2,2)
-    plt.bar(range(256),histo1)
-    plt.title("histogram-before thresolding")
-    
-    plt.subplot(2,2,3)
-    plt.imshow(thresold_img,cmap='gray')
+    plt.imshow(threshold_img,cmap='gray')
     plt.title('thresold image')
     
-    plt.subplot(2,2,4)
-    plt.bar(range(256),histo2)
-    plt.title("histogram-after thresolding")
-    
-    plt.show()
+    # 
+    hist1=histogram(img)
+    hist2=histogram(threshold_img)
 
+    
+    plt.subplot(2,2,3)
+    plt.bar(range(256),hist1)
+    plt.title('histogram before thresolding')
+    
+    plt.subplot(2,2,4)
+    plt.bar(range(256),hist2)
+    plt.title('histogram after thresolding')
+    
+    
+    plt.tight_layout()
+    plt.show()
+    
 if __name__=='__main__':
     main()
+ 
