@@ -12,6 +12,9 @@
 #Take grayscale image of size 512x512, add some salt & pepper noise and perform the following operations –
 #3(c)Apply harmonic and geometric mean filter on the noisy image and compare their performance with PSNR
 
+#Take grayscale image of size 512x512, add some salt & pepper noise and perform the following operations –
+#3(c)Apply harmonic and geometric mean filter on the noisy image and compare their performance with PSNR
+
 #Geometric Mean:
 # [product(f(x,y)]**(1/(mask_size*mask_size))
 # Achieves similar smoothing to the arithmetic mean, but tends to lose less image detail
@@ -37,8 +40,8 @@ def harmonic_mean_filter(img,mask_size):
                 for j in range(-pad,pad+1):
                     nr=r+i
                     nc=c+j
-                    if (padded_image[nr][nc]!=0.0):
-                        neighborhood+=(1/padded_image[nr][nc])
+                    # if (padded_image[nr][nc]!=0.0):
+                    neighborhood+=(1/(padded_image[nr][nc]+1e-9))
             if (neighborhood!=0.0):
                  temp[r-pad][c-pad]=(mask_size*mask_size)/neighborhood
     return temp
@@ -73,7 +76,7 @@ def add_salt_noise(img):
     # number of noise
     temp=np.copy(img)
     h,w=img.shape
-    n=np.random.randint(40000,90000)
+    n=np.random.randint(80000,90000)
     for i in range(n):
         x=np.random.randint(0,h)
         y=np.random.randint(0,w)
