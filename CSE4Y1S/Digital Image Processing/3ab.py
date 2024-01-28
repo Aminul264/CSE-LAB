@@ -4,114 +4,84 @@
 # Use different size of mask (3x3, 5x5, 7x7) with average filter for noise suppression and observe their performance in term of PSNR
 
 
-import cv2
 import matplotlib.pyplot as plt
-import random
 import numpy as np
-from math import sqrt ,log10
+import cv2
 
 def add_noise(img):
-    temp=np.copy(img)
-    row,col=temp.shape
-    #amount of noise  in between 400 and 1000
-    amount_of_noise=random.randint(8000,10000)
-    
-    #some random pixel & add salt noise to these pixels
-    for i in range(amount_of_noise):
-        x_axis=random.randint(0,row-1)
-        y_axis=random.randint(0,col-1)
-        temp[x_axis][y_axis]=255
-    #some random pixel & add peeper noise to these pixels   
-    for i in range(amount_of_noise):
-        x_axis=random.randint(0,row-1)
-        y_axis=random.randint(0,col-1)
-        temp[x_axis][y_axis]=0
-    return temp
-
-def average_filter(img,mask_size):
-    temp=np.copy(img)
+    # amount of noise
+    n=np.random.randint(50000,90000)
     row,col=img.shape
-    
+    temp=np.copy(img)
+    # salt noise in some random pixels
+    for i in range(n):
+        x=np.random.randint(0,row-1)
+        y=np.random.randint(0,col-1)
+        temp[x,y]=255
+    # peeper noise in some randome pixels
+    for i in range(n):
+        x=np.random.randint(0,row-1)
+        y=np.random.randint(0,col-1)
+        temp[x,y]=0
+    return temp  
 
-    n=mask_size
-    # select the area
-    left=n//2
-    right=left+1 #before end
-    sum=0
-    for i in range(left,row-left): # from starting  to ending index for row processing
-        for j in range(left,col-left): # from starting  to ending index for column
+     
+def apply_average_filter(noisy_img,mask):
+    
+    temp=np.copy(noisy_img)
+    pad=mask//2
+    padded_img=np.pad(noisy_img,((pad,pad),(pad,pad)))#(top,botto),(left,right)
+    row,col=padded_img.shape
+    
+    for r in range(pad,row-pad):
+        for c in range(pad,col-pad):
             sum=0
-            for k in range(i-left,i+right):
-                for l in range(j-left,j+right):
-                    sum+=temp[k][l]
-            temp[i][j]=sum/(n*n)#mask size
-    return temp
+            for i in range(-pad,pad+1):
+                for j in range(-pad,pad+1):
+                    nr=r+i
+                    nc=c+j
+                    sum+=padded_img[nr,nc]
+            temp[r-pad,c-pad]=sum/(mask**2)
+            
+    return (temp)
 
-def median_filter(img,mask_size):
-    temp=np.copy(img)
-    row,col=img.shape
+def calculate_psnr(img1,img2):
     
-    # mask size
-    n=mask_size
-    start=n//2
-    end=start+1
+    img1,img2=np.float64(img1),np.float64(img2)
+    mse=np.mean((img1-img2)**2)
+    if mse==0:
+        return float('inf')
+    psnr=20*np.log10(255.0)-10*np.log10(mse)
     
-    for i in range(start,row-end):
-        for j in range(start,col-end):
-            list=[]
-            for k in range(i-start,i+end):
-                for l in range(j-start,j+end):
-                    list.append(img[k][l])
-            sorted(list)
-            temp[i][j]=list[len(list)//2]#store middle value
-    
-    return temp
-
-def PSNR(original, compressed): 
-    mse=np.mean((original-compressed)**2)#mse-mean square error
-    L=256
-    psnr=20*log10((L-1)/mse)
-    return psnr
-
+    return round(psnr,2)
+               
 def main():
-    img =cv2.imread('../images/rose.jpg',cv2.IMREAD_GRAYSCALE)
-    row,col=512,512
-    img=cv2.resize(img,(row,col))
-    
-    #add noise
+    img=cv2.imread('../images/MotherBoard.png',0)
+    img=cv2.resize(img,(512,512))
     noisy_img=add_noise(img)
-    # average filter
-    avg_filtered_img=average_filter(noisy_img,mask_size=7)
-    # Mediun filter
-    mediun_filtered_img=median_filter(noisy_img,mask_size=7)
     
-    
-    
-    #print
     plt.subplot(2,2,1)
-    plt.imshow(img,cmap='gray')
-    plt.title('original image')
-    
-    plt.subplot(2,2,2)
     plt.imshow(noisy_img,cmap='gray')
     plt.title('noisy image')
-    # average img
-    plt.subplot(2,2,3)
-    plt.imshow(avg_filtered_img,cmap='gray')
-    plt.title('Average filtered image')
-    # mediun image
-    plt.subplot(2,2,4)
-    plt.imshow(mediun_filtered_img,cmap='gray')
-    plt.title('Mediun filtered image')
+    k=1
+    for i in range(3,8,2):
+        tmp=apply_average_filter(noisy_img,mask=i)
+        psnr=calculate_psnr(tmp,img)
+        # tmp=cv2.blur(noisy_img,(i,i))
+        # psnr = cv2.PSNR(img, tmp)
+        k+=1
+        plt.subplot(2,2,k)
+        plt.imshow(tmp,cmap='gray')
+        plt.title(f' avg filter,mask :{i}x{i} psnr:{psnr}')
+        
     
-    psnr1=PSNR(img,avg_filtered_img)
-    psnr2=PSNR(img,mediun_filtered_img)
+    # plt.subplot(2,2,4)
+    # plt.imshow(cv2.blur(noisy_img,(5,5)),cmap='gray')
+    # plt.title('built-in average filter')
     
-    print(f"PSNR of Average filtered img {psnr1}")
-    print(f"PSNR of Median filtered img {psnr2}")
     
+    
+    plt.tight_layout()
     plt.show()
-    
 if __name__=='__main__':
     main()
-
