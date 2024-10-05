@@ -1,42 +1,42 @@
-def encrypt(plaintext, width):
-    # Ensure the length is a multiple of the width by adding padding (only once)
-    padding = width - len(plaintext) % width
-    if padding != 0 and padding != width:  # Add padding only if needed
-        plaintext += '-' * padding  # Padding with '-'
-    
-    cipher = ""
+def encryption(msg, width):
+    ans = ""
     for i in range(width):
-        for j in range(i, len(plaintext), width):
-            cipher += plaintext[j]
-    
-    return cipher
+        for j in range(i, len(msg), width):
+            ans += msg[j]
+    return ans
 
-def decrypt(cipher, width):
-    plaintext = ""
-    row = len(cipher) // width
-    for i in range(row):
-        for j in range(i, len(cipher), row):
-            plaintext += cipher[j]
-    return plaintext
+def decryption(cipher, width):
+    height = len(cipher) // width
+    extra = len(cipher) % width
+
+    # Create a list to hold the decrypted message
+    ans = [""] * len(cipher)
+    idx = 0
+
+    # Distribute the characters from the cipher into the correct positions
+    for col in range(width):
+        col_height = height + 1 if col < extra else height
+        for row in range(col_height):
+            ans[row * width + col] = cipher[idx]
+            idx += 1
+
+    return ''.join(ans)
+
+
+
 
 if __name__ == "__main__":
-    with open('input.txt') as infile:
-        # Read and process input
-        width = int(infile.readline().strip())
-        plaintext = infile.read().replace('\n', '')  # Remove newlines from the message
+    with open('example.txt', 'r') as infile:
+        plaintext = infile.readline().strip()
+        width = 10  # Define the width for encryption
 
-        # First round of encryption (first transposition)
-        cipher1 = encrypt(plaintext, width)
-        
-        # Second round of encryption (double transposition)
-        cipher2= encrypt(cipher1, width)
-        print("Double Encrypted (without padding):", cipher2.replace('-', ''))
+    print(f"Original Text: {plaintext}")
+    
+    # Perform double encryption
+    en_text = encryption(encryption(plaintext, width), width)
+    print(f"Cipher Text: {en_text}")
+    
+    # Perform double decryption
+    dec_text = decryption(decryption(en_text, width), width)
+    print(f"Decrypted Text: {dec_text}")
 
-        # First round of decryption
-        decipher1 = decrypt(cipher2, width)
-        
-        # Second round of decryption (double transposition)
-        decipher2 = decrypt(decipher1, width)
-        
-        # Output the original plaintext
-        print("Decrypted (Original Plaintext):", decipher2.replace('-', ''))
